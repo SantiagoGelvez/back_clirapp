@@ -1,0 +1,26 @@
+[
+  {
+    "model": "apiv1.InvitationUserCompanyStatus",
+    "pk": 1,
+    "fields": {
+      "name": "Pending",
+      "code": "PEN"
+    }
+  },
+  {
+      "model": "apiv1.InvitationUserCompanyStatus",
+      "pk": 2,
+      "fields": {
+      "name": "Accepted",
+      "code": "ACC"
+      }
+  },
+  {
+      "model": "apiv1.InvitationUserCompanyStatus",
+      "pk": 3,
+      "fields": {
+      "name": "Rejected",
+      "code": "REJ"
+      }
+  }
+]
