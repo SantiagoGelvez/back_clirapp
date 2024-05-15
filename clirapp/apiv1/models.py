@@ -18,6 +18,14 @@ class Company(models.Model):
     def __str__(self):
         return f'{self.name}'
 
+    @staticmethod
+    def create(**kwargs):
+        try:
+            company = Company.objects.create(**kwargs)
+            return company
+        except Exception as e:
+            raise e
+
 
 class CustomUser(AbstractUser):
     uuid = models.UUIDField(unique=True, default=uuid.uuid4, editable=False)
@@ -50,7 +58,7 @@ class InvitationUserCompany(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     company = models.ForeignKey(Company, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
-    status = models.ForeignKey(InvitationUserCompanyStatus, on_delete=models.CASCADE, null=True, blank=True)
+    status = models.ForeignKey(InvitationUserCompanyStatus, on_delete=models.CASCADE, to_field='code', null=True, blank=True)
     email = models.EmailField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -63,6 +71,9 @@ class Project(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
@@ -72,6 +83,9 @@ class UserStory(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     project = models.ForeignKey(Project, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
@@ -87,8 +101,8 @@ class Ticket(models.Model):
     user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
     comments = models.TextField()
-    status = models.ForeignKey(TicketStatus, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    status = models.ForeignKey(TicketStatus, on_delete=models.CASCADE, to_field='code')
+    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
