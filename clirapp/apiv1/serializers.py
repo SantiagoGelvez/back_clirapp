@@ -1,9 +1,17 @@
 from rest_framework import serializers
 
-from .models import CustomUser, Company, Project, UserStory, Ticket, TicketStatus
+from .models import CustomUser, Company, Project, UserStory, Ticket, TicketStatus, TicketComment, InvitationUserCompany
+
+
+class CompanySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Company
+        fields = ('id', 'uuid', 'name', 'nit', 'email', 'website', 'created_at', 'updated_at')
 
 
 class UserSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+
     class Meta:
         model = CustomUser
         fields = ('id', 'uuid', 'first_name', 'last_name', 'email', 'phone', 'company', 'password')
@@ -30,22 +38,38 @@ class UserSerializer(serializers.ModelSerializer):
         return instance
 
 
-class CompanySerializer(serializers.ModelSerializer):
+class InvitationUserCompanyStatusSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Company
-        fields = ('id', 'uuid', 'name', 'nit', 'email', 'website', 'created_at', 'updated_at')
+        model = InvitationUserCompany
+        fields = ('id', 'code', 'name')
+
+
+class InvitationUserCompanySerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+    user = UserSerializer(read_only=True)
+    status = InvitationUserCompanyStatusSerializer(read_only=True)
+
+    class Meta:
+        model = InvitationUserCompany
+        fields = ('id', 'uuid', 'company', 'user', 'status', 'email', 'created_at', 'updated_at')
 
 
 class ProjectSerializer(serializers.ModelSerializer):
+    company = CompanySerializer(read_only=True)
+    created_by = UserSerializer(read_only=True)
+
     class Meta:
         model = Project
-        fields = ('id', 'uuid', 'name', 'company', 'created_at', 'updated_at')
+        fields = ('id', 'uuid', 'name', 'company', 'created_by', 'created_at', 'last_modified')
 
 
 class UserStorySerializer(serializers.ModelSerializer):
+    project = ProjectSerializer(read_only=True)
+    created_by = UserSerializer(read_only=True)
+
     class Meta:
         model = UserStory
-        fields = ('id', 'uuid', 'name', 'description', 'project', 'created_at', 'updated_at')
+        fields = ('id', 'uuid', 'title', 'project', 'created_by', 'created_at', 'last_modified')
 
 
 class TicketStatusSerializer(serializers.ModelSerializer):
@@ -55,9 +79,19 @@ class TicketStatusSerializer(serializers.ModelSerializer):
 
 
 class TicketSerializer(serializers.ModelSerializer):
-    status = TicketStatusSerializer()
+    user_story = UserStorySerializer(read_only=True)
+    status = TicketStatusSerializer(read_only=True)
+    created_by = UserSerializer(read_only=True)
 
     class Meta:
         model = Ticket
-        fields = ('id', 'uuid', 'name', 'status', 'description', 'user_story', 'created_at', 'updated_at')
+        fields = ('id', 'uuid', 'title', 'user_story', 'status', 'created_by', 'created_at', 'last_modified')
 
+
+class TicketCommentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    ticket = TicketSerializer(read_only=True)
+
+    class Meta:
+        model = TicketComment
+        fields = ('id', 'user', 'ticket', 'comment', 'created_at')

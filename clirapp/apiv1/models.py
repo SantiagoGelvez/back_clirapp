@@ -100,11 +100,31 @@ class Ticket(models.Model):
     uuid = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_story = models.ForeignKey(UserStory, on_delete=models.CASCADE)
     title = models.CharField(max_length=100)
-    comments = models.TextField()
+    comments = models.ManyToManyField(CustomUser, related_name='comments', through='TicketComment', through_fields=('ticket', 'user'))
     status = models.ForeignKey(TicketStatus, on_delete=models.CASCADE, to_field='code')
     created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=True)
+    assigned_to = models.ManyToManyField(CustomUser, related_name='tickets', through='TicketAssignedTo', through_fields=('ticket', 'user'), blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     last_modified = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.title
+
+
+class TicketComment(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    comment = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.ticket.title} - {self.user.email}'
+
+
+class TicketAssignedTo(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.ticket.title} - {self.user.email}'
