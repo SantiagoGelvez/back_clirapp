@@ -10,11 +10,10 @@ class CompanySerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-    company = CompanySerializer(read_only=True)
 
     class Meta:
         model = CustomUser
-        fields = ('id', 'uuid', 'first_name', 'last_name', 'email', 'phone', 'company', 'password')
+        fields = ('id', 'uuid', 'first_name', 'last_name', 'email', 'phone', 'password')
         extra_kwargs = {'password': {'write_only': True, 'required': True}}
 
     def create(self, validated_data):

@@ -6,11 +6,17 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.decorators import api_view
 
 from .models import CustomUser, Company, Project, UserStory, Ticket, InvitationUserCompany, InvitationUserCompanyStatus
 from .modules.common import get_user_from_jwt_token
 from .serializers import UserSerializer, CompanySerializer, ProjectSerializer, UserStorySerializer, TicketSerializer, \
     InvitationUserCompanySerializer
+
+
+@api_view(['GET'])
+def test_message(request):
+    return Response({'message': 'Hello, VUE 3!'})
 
 
 class SignUpView(APIView):

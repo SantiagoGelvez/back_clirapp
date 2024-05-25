@@ -138,6 +138,6 @@ AUTH_USER_MODEL = 'apiv1.CustomUser'
 
 # CORS settings
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
+    "http://localhost:5175",
 ]
 CORS_ALLOW_CRENDENTIALS = True
